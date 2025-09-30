@@ -1,0 +1,72 @@
+[
+    {
+        "id": "txn_001",
+        "amount": 5000,
+        "currency": "USD",
+        "scheduled_date": "2025-07-26",
+        "recipient": "John Doe"
+    },
+    {
+        "id": "txn_002",
+        "amount": 2500,
+        "currency": "USD",
+        "scheduled_date": "2025-10-01",
+        "recipient": "Jane Smith"
+    },
+    {
+        "id": "txn_003",
+        "amount": 7500,
+        "currency": "USD",
+        "scheduled_date": "2025-10-02",
+        "recipient": "Acme Corp"
+    },
+    {
+        "id": "txn_004",
+        "amount": 1200,
+        "currency": "USD",
+        "scheduled_date": "2025-10-01",
+        "recipient": "John Doe"
+    },
+    {
+        "id": "txn_005",
+        "amount": 3300,
+        "currency": "USD",
+        "scheduled_date": "2025-10-03",
+        "recipient": "Tech Solutions LLC"
+    },
+    {
+        "id": "txn_006",
+        "amount": 950,
+        "currency": "USD",
+        "scheduled_date": "2025-09-30",
+        "recipient": "Office Supplies Inc"
+    },
+    {
+        "id": "txn_007",
+        "amount": 15000,
+        "currency": "USD",
+        "scheduled_date": "2025-10-05",
+        "recipient": "Construction Co"
+    },
+    {
+        "id": "txn_008",
+        "amount": 800,
+        "currency": "USD",
+        "scheduled_date": "2025-10-01",
+        "recipient": "Jane Smith"
+    },
+    {
+        "id": "txn_009",
+        "amount": 4200,
+        "currency": "USD",
+        "scheduled_date": "2025-10-04",
+        "recipient": "Marketing Agency"
+    },
+    {
+        "id": "txn_010",
+        "amount": 6700,
+        "currency": "USD",
+        "scheduled_date": "2025-10-02",
+        "recipient": "Legal Services"
+    }
+]
