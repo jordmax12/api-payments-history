@@ -1,0 +1,21 @@
+# CDK asset excludes
+*.ts~
+*.js.map
+*.d.ts
+node_modules
+*.git*
+.git/
+cdk.out/
+.DS_Store
+README.md
+*.md
+.env*
+.vscode/
+.idea/
+*.log
+coverage/
+test/
+tests/
+__tests__/
+*.test.js
+*.spec.js

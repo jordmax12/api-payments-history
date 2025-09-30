@@ -1,6 +1,12 @@
 # API Payments History
 
-For an interview process, a payments history API built with Node.js and Express.
+For an interview process, a payments history API built with Node.js and Express. This application can run both locally and as an AWS Lambda function.
+
+## Architecture
+
+- **Local Development**: Express server running on localhost
+- **Production**: AWS Lambda function behind API Gateway (deployed via CDK)
+- **Hybrid Approach**: Same codebase works in both environments using `serverless-http`
 
 ## Setup
 
@@ -14,14 +20,32 @@ For an interview process, a payments history API built with Node.js and Express.
    npm install
    ```
 
-3. **Start the server**:
-   ```bash
-   # Development mode with auto-reload
-   npm run dev
-   
-   # Production mode
-   npm start
-   ```
+## Local Development
+
+**Start the server locally**:
+```bash
+# Development mode with auto-reload
+npm run dev
+
+# Production mode
+npm start
+```
+
+Server runs on http://localhost:3000
+
+## AWS Deployment
+
+**Deploy to AWS using CDK**:
+```bash
+# First time setup (if you haven't used CDK before)
+npx cdk bootstrap
+
+# Deploy the stack
+npm run deploy
+
+# View the CloudFormation template
+npm run synth
+```
 
 ## API Endpoints
 
@@ -47,7 +71,7 @@ For an interview process, a payments history API built with Node.js and Express.
 - **GET** `/payments/:id` - Get specific payment by ID
 
 ### Health Check
-- **GET** `/health` - Server health status
+- **GET** `/health` - Server health status (shows if running locally or in Lambda)
 
 ## Sample Data
 
@@ -74,7 +98,30 @@ The `/payments` endpoint returns:
 }
 ```
 
-## Development
+## Features
 
-- Server runs on port 3000 by default
-- Use `npm run dev` for development with auto-reload
+- ✅ **24-Hour Highlighting**: Payments scheduled within 24 hours have `isWithin24Hours: true`
+- ✅ **Total Amount Calculation**: Shows sum of filtered results
+- ✅ **Flexible Filtering**: By recipient, date ranges, or exact dates
+- ✅ **Hybrid Deployment**: Same code runs locally and in Lambda
+- ✅ **CDK Infrastructure**: One-command deployment to AWS
+
+## Project Structure
+
+```
+├── app.js              # Express application (shared)
+├── server.js           # Local server entry point
+├── lambda.js           # Lambda handler entry point
+├── infrastructure/     # CDK deployment code
+│   ├── app.js         # CDK app
+│   └── payments-api-stack.js  # Stack definition
+├── package.json        # Dependencies and scripts
+└── cdk.json           # CDK configuration
+```
+
+## Development vs Production
+
+- **Local**: Express server with hot reload
+- **Lambda**: Serverless function with API Gateway
+- **Detection**: Uses `AWS_LAMBDA_FUNCTION_NAME` environment variable
+- **Same Code**: No changes needed between environments

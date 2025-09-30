@@ -1,0 +1,36 @@
+{
+  "version": "48.0.0",
+  "files": {
+    "813d849898acf541a1385a348d7f0896ce9ad919d16208c0f3df3dc3f68924e4": {
+      "displayName": "PaymentsApiFunction/Code",
+      "source": {
+        "path": "asset.813d849898acf541a1385a348d7f0896ce9ad919d16208c0f3df3dc3f68924e4",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "384762904558-us-east-1-c613a072": {
+          "bucketName": "cdk-hnb659fds-assets-384762904558-us-east-1",
+          "objectKey": "813d849898acf541a1385a348d7f0896ce9ad919d16208c0f3df3dc3f68924e4.zip",
+          "region": "us-east-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::384762904558:role/cdk-hnb659fds-file-publishing-role-384762904558-us-east-1"
+        }
+      }
+    },
+    "f4b31254f9244604da48914a2ded95111a4b3ffb4e9e32fd94df833b5b68f0e1": {
+      "displayName": "PaymentsApiStack Template",
+      "source": {
+        "path": "PaymentsApiStack.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "384762904558-us-east-1-f735ce7a": {
+          "bucketName": "cdk-hnb659fds-assets-384762904558-us-east-1",
+          "objectKey": "f4b31254f9244604da48914a2ded95111a4b3ffb4e9e32fd94df833b5b68f0e1.json",
+          "region": "us-east-1",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::384762904558:role/cdk-hnb659fds-file-publishing-role-384762904558-us-east-1"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}
