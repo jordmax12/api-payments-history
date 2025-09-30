@@ -12,7 +12,7 @@ class PaymentsApiStack extends Stack {
       runtime: Runtime.NODEJS_20_X,
       handler: 'lambda.handler',
       code: Code.fromAsset(path.join(__dirname, '..'), {
-        exclude: ['cdk.out', '.git', 'infrastructure', 'README.md', '*.md', '.env*', 'test', 'tests', '__tests__']
+        exclude: ['cdk.out', '.git', 'infrastructure', 'README.md', '*.md', '.env*', '__tests__', 'eslint.config.js']
       }),
       timeout: Duration.seconds(29)
     });

@@ -1,4 +1,5 @@
-# CDK asset excludes
+# CDK asset excludes - only for non-Lambda assets
+# Note: Lambda assets use explicit exclude in payments-api-stack.js
 *.ts~
 *.js.map
 *.d.ts
