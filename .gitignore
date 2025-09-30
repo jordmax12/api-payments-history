@@ -5,4 +5,4 @@ requirements.txt
 .env
 
 # CDK build output
-cdk.out/
+cdk.out
