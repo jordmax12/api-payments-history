@@ -33,7 +33,6 @@ npm run dev:frontend   # React app only
 ## Features
 
 ✅ **Backend API**
-- `/test` - Hello World endpoint
 - `/payments` - List pending payments with filtering
 - `/payments/:id` - Get payment by ID
 - DynamoDB (production) / JSON file (local development)
@@ -66,7 +65,19 @@ npm run test         # Run all tests
 
 ## Deployment
 
-**Backend**: Deploys to AWS Lambda + API Gateway via CDK
-**Frontend**: Static build ready for S3 + CloudFront
+**Full-Stack Deployment to AWS**:
+```bash
+# First deployment (builds frontend + deploys everything)
+npm run deploy
+
+# After first deployment, update frontend/.env.production with the API URL
+# Then redeploy to update frontend with correct API endpoint
+npm run deploy
+```
+
+**What gets deployed**:
+- **Backend**: Lambda + API Gateway + DynamoDB
+- **Frontend**: S3 + CloudFront (global CDN)
+- **CORS**: Automatically configured for cross-origin requests
 
 See individual `backend/` and `frontend/` directories for detailed documentation.
