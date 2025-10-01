@@ -16,15 +16,6 @@ const isWithin24Hours = (scheduledDate) => {
   return diffInHours > 0 && diffInHours <= 24;
 };
 
-// Test endpoint
-app.get('/test', (req, res) => {
-  res.status(200).json({
-    message: 'Hello World',
-    statusCode: 200
-  });
-});
-
-// Get all payments with optional filtering
 app.get('/payments', async (req, res) => {
   try {
     const filters = {
@@ -66,7 +57,6 @@ app.get('/payments', async (req, res) => {
   }
 });
 
-// Get payment by ID
 app.get('/payments/:id', async (req, res) => {
   try {
     const payment = await dataLayer.getPaymentById(req.params.id);
@@ -85,7 +75,6 @@ app.get('/payments/:id', async (req, res) => {
   }
 });
 
-// Health check endpoint
 app.get('/health', (req, res) => {
   res.json({
     status: 'healthy',
