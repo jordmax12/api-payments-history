@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-const DataLayer = require('./src/dataLayer');
+const DataLayer = require('./src/data-layer');
 
 const app = express();
 const dataLayer = new DataLayer();
@@ -32,6 +32,14 @@ app.get('/payments', async (req, res) => {
       before: req.query.before,
       date: req.query.date
     };
+
+    const validFilters = validateFilters(filters);
+
+    const { isValid: isValidRequest, error: errorRequest } = validFilters;
+
+    if (isValidRequest) {
+      return res.status(errorRequest?.status || 400).json(errorRequest?.message || 'Invalid request most likely bad filters.');
+    }
 
     const filteredPayments = await dataLayer.getPaymentsWithFilters(filters);
 
