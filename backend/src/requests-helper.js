@@ -1,3 +1,10 @@
+const isWithin24Hours = (scheduledDate) => {
+  const now = new Date();
+  const paymentDate = new Date(scheduledDate);
+  const diffInHours = (paymentDate - now) / (1000 * 60 * 60);
+  return diffInHours > 0 && diffInHours <= 24;
+};
+
 const validateFilters = (filters) => {
   const { recipient, after, before, date } = filters;
 
@@ -65,5 +72,6 @@ const validateFilters = (filters) => {
 };
 
 module.exports = {
+  isWithin24Hours,
   validateFilters
 };

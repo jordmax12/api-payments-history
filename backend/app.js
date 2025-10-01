@@ -1,20 +1,13 @@
 const express = require('express');
 const cors = require('cors');
 const DataLayer = require('./src/data-layer');
-const { validateFilters } = require('./src/requests-helper');
+const { isWithin24Hours, validateFilters } = require('./src/requests-helper');
 
 const app = express();
 const dataLayer = new DataLayer();
 
 app.use(cors());
 app.use(express.json());
-
-const isWithin24Hours = (scheduledDate) => {
-  const now = new Date();
-  const paymentDate = new Date(scheduledDate);
-  const diffInHours = (paymentDate - now) / (1000 * 60 * 60);
-  return diffInHours > 0 && diffInHours <= 24;
-};
 
 app.get('/payments', async (req, res) => {
   try {

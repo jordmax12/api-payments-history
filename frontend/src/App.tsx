@@ -25,6 +25,7 @@ function App() {
   const [error, setError] = useState<string | null>(null);
   const [recipientFilter, setRecipientFilter] = useState('');
   const [dateFilter, setDateFilter] = useState('');
+  const [dateFilterType, setDateFilterType] = useState<'after' | 'before'>('after');
   const [totalAmount, setTotalAmount] = useState(0);
   const [dataSource, setDataSource] = useState('');
 
@@ -35,7 +36,7 @@ function App() {
       setLoading(true);
       const params = new URLSearchParams();
       if (recipientFilter) params.append('recipient', recipientFilter);
-      if (dateFilter) params.append('after', dateFilter);
+      if (dateFilter) params.append(dateFilterType, dateFilter);
 
       const response = await fetch(`${API_BASE_URL}/payments?${params}`);
       if (!response.ok) {
@@ -60,7 +61,7 @@ function App() {
     }, 300); // 300ms delay
 
     return () => clearTimeout(timeoutId);
-  }, [recipientFilter, dateFilter]);
+  }, [recipientFilter, dateFilter, dateFilterType]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -71,6 +72,31 @@ function App() {
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString();
+  };
+
+  const clearAllFilters = async () => {
+    // Clear all filter states
+    setRecipientFilter('');
+    setDateFilter('');
+    setDateFilterType('after');
+    
+    // Fetch all payments (no filters applied)
+    try {
+      setLoading(true);
+      const response = await fetch(`${API_BASE_URL}/payments`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch payments');
+      }
+
+      const data: PaymentsResponse = await response.json();
+      setPayments(data.payments);
+      setTotalAmount(data.totalAmount);
+      setDataSource(data.dataSource);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (loading) {
@@ -101,13 +127,34 @@ function App() {
             />
           </div>
           <div className="filter-group">
-            <label htmlFor="date">Payments after:</label>
+            <label htmlFor="dateType">Date Filter:</label>
+            <select
+              id="dateType"
+              value={dateFilterType}
+              onChange={(e) => setDateFilterType(e.target.value as 'after' | 'before')}
+            >
+              <option value="after">After</option>
+              <option value="before">Before</option>
+            </select>
+          </div>
+          <div className="filter-group">
+            <label htmlFor="date">Date:</label>
             <input
               id="date"
               type="date"
               value={dateFilter}
               onChange={(e) => setDateFilter(e.target.value)}
+              placeholder={`Select date to filter ${dateFilterType}`}
             />
+          </div>
+          <div className="filter-group">
+            <button 
+              className="clear-filters-btn"
+              onClick={clearAllFilters}
+              type="button"
+            >
+              Clear Filters
+            </button>
           </div>
         </div>
 
