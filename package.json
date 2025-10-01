@@ -1,42 +1,27 @@
 {
     "name": "api-payments-history",
     "version": "1.0.0",
-    "description": "For an interview process, a payments history API",
-    "main": "server.js",
-    "scripts": {
-        "start": "node -r dotenv/config server.js",
-        "dev": "nodemon -r dotenv/config server.js",
-        "test": "jest",
-        "cdk": "dotenv cdk",
-        "deploy": "dotenv cdk deploy",
-        "synth": "dotenv cdk synth",
-        "bootstrap": "dotenv cdk bootstrap"
-    },
-    "keywords": [
-        "payments",
-        "api",
-        "express",
-        "nodejs"
+    "description": "Full-stack payments history application with Express API and React frontend",
+    "private": true,
+    "workspaces": [
+        "backend",
+        "frontend"
     ],
-    "author": "",
-    "license": "ISC",
-    "dependencies": {
-        "express": "^4.18.2",
-        "cors": "^2.8.5",
-        "serverless-http": "^3.2.0",
-        "dotenv": "^16.3.1"
+    "scripts": {
+        "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+        "dev:backend": "cd backend && npm run dev",
+        "dev:frontend": "cd frontend && PORT=3001 npm start",
+        "build": "npm run build:backend && npm run build:frontend",
+        "build:backend": "cd backend && npm install",
+        "build:frontend": "cd frontend && npm run build",
+        "deploy": "cd backend && npm run deploy",
+        "bootstrap": "cd backend && npm run bootstrap",
+        "test": "npm run test:backend && npm run test:frontend",
+        "test:backend": "cd backend && npm test",
+        "test:frontend": "cd frontend && npm test -- --watchAll=false"
     },
     "devDependencies": {
-        "@aws-sdk/client-dynamodb": "^3.400.0",
-        "@aws-sdk/lib-dynamodb": "^3.400.0",
-        "@eslint/js": "^9.36.0",
-        "eslint": "^9.36.0",
-        "nodemon": "^3.0.1",
-        "jest": "^29.7.0",
-        "supertest": "^6.3.3",
-        "aws-cdk-lib": "^2.100.0",
-        "constructs": "^10.3.0",
-        "dotenv-cli": "^7.3.0"
+        "concurrently": "^8.2.2"
     },
     "engines": {
         "node": "22"

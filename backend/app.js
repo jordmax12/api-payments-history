@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const DataLayer = require('./src/data-layer');
+const { validateFilters } = require('./src/requests-helper');
 
 const app = express();
 const dataLayer = new DataLayer();
@@ -37,7 +38,7 @@ app.get('/payments', async (req, res) => {
 
     const { isValid: isValidRequest, error: errorRequest } = validFilters;
 
-    if (isValidRequest) {
+    if (!isValidRequest) {
       return res.status(errorRequest?.status || 400).json(errorRequest?.message || 'Invalid request most likely bad filters.');
     }
 

@@ -63,3 +63,7 @@ const validateFilters = (filters) => {
     error: null
   };
 };
+
+module.exports = {
+  validateFilters
+};
