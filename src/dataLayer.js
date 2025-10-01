@@ -52,6 +52,11 @@ class DataLayer {
     }
   }
 
+  async getPendingPayments() {
+    const allPayments = await this.getAllPayments();
+    return allPayments.filter(payment => payment.status === 'pending');
+  }
+
   async getPaymentById(id) {
     if (this.isLambda) {
       // DynamoDB get item
@@ -69,8 +74,8 @@ class DataLayer {
   }
 
   async getPaymentsWithFilters(filters = {}) {
-    const allPayments = await this.getAllPayments();
-    let filteredPayments = [...allPayments];
+    const pendingPayments = await this.getPendingPayments();
+    let filteredPayments = [...pendingPayments];
 
     // Filter by recipient
     if (filters.recipient) {
