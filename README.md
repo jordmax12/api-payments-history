@@ -11,8 +11,9 @@ Full-stack payments history application with Express API backend and React front
 ## Quick Start
 
 ```bash
-# Install all dependencies
-npm install
+# Install dependencies (backend and frontend separately)
+cd backend && npm install
+cd ../frontend && npm install
 
 # Run both backend (port 3000) and frontend (port 3001)
 npm run dev
@@ -26,15 +27,23 @@ npm run dev:frontend   # React app only
 
 ```
 ├── backend/           # Express API + CDK deployment
+│   ├── src/          # Data layer & request helpers
+│   ├── __tests__/    # Unit & integration tests
+│   ├── infrastructure/ # CDK deployment config
+│   └── data/         # Local JSON test data
 ├── frontend/          # React TypeScript app
-└── package.json      # Workspace root with scripts
+│   └── src/          # React components & styles
+└── package.json      # Root orchestration scripts
 ```
+
+**Note**: This is a simple monorepo without npm workspaces to avoid Lambda deployment complexity.
 
 ## Features
 
 ✅ **Backend API**
-- `/payments` - List pending payments with filtering
+- `/payments` - List pending payments with filtering (recipient, date)
 - `/payments/:id` - Get payment by ID
+- `/health` - Health check endpoint
 - DynamoDB (production) / JSON file (local development)
 
 ✅ **Frontend UI**
@@ -60,7 +69,9 @@ cp backend/.env-sample backend/.env
 npm run dev          # Run both backend + frontend
 npm run build        # Build both for production
 npm run deploy       # Deploy backend to AWS
-npm run test         # Run all tests
+npm run test         # Run all tests (backend + frontend)
+npm run test:backend # Run backend tests only
+npm run test:frontend # Run frontend tests only
 ```
 
 ## Deployment
