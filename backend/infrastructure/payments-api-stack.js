@@ -2,7 +2,7 @@ const { Stack, Duration, CfnOutput, RemovalPolicy } = require('aws-cdk-lib');
 const { Function, Runtime, Code } = require('aws-cdk-lib/aws-lambda');
 const { RestApi, LambdaIntegration, Cors } = require('aws-cdk-lib/aws-apigateway');
 const { Table, AttributeType, BillingMode } = require('aws-cdk-lib/aws-dynamodb');
-const { Bucket, BucketAccessControl } = require('aws-cdk-lib/aws-s3');
+const { Bucket } = require('aws-cdk-lib/aws-s3');
 const { BucketDeployment, Source } = require('aws-cdk-lib/aws-s3-deployment');
 const { Distribution, OriginAccessIdentity } = require('aws-cdk-lib/aws-cloudfront');
 const { S3Origin } = require('aws-cdk-lib/aws-cloudfront-origins');
@@ -25,7 +25,28 @@ class PaymentsApiStack extends Stack {
       runtime: Runtime.NODEJS_20_X,
       handler: 'lambda.handler',
       code: Code.fromAsset(path.join(__dirname, '..'), {
-        exclude: ['cdk.out', '.git', 'infrastructure', 'README.md', '*.md', '.env*', '__tests__', 'eslint.config.js']
+        exclude: [
+          'cdk.out/**',
+          'infrastructure/**',
+          '.git/**',
+          '__tests__/**',
+          'coverage/**',
+          'node_modules/@aws-sdk/**',
+          'node_modules/@smithy/**',
+          'node_modules/aws-cdk-lib/**',
+          'node_modules/constructs/**',
+          'node_modules/@eslint/**',
+          'node_modules/eslint/**',
+          'node_modules/jest/**',
+          'node_modules/supertest/**',
+          'node_modules/nodemon/**',
+          'node_modules/dotenv-cli/**',
+          'node_modules/.bin/**',
+          '*.md',
+          '.env*',
+          'eslint.config.js',
+          'jest.config.js'
+        ]
       }),
       timeout: Duration.seconds(29),
       environment: {

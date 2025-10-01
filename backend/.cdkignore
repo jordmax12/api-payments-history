@@ -1,22 +1,29 @@
-# CDK asset excludes - only for non-Lambda assets
-# Note: Lambda assets use explicit exclude in payments-api-stack.js
-*.ts~
-*.js.map
-*.d.ts
-node_modules
-*.git*
-.git/
+# CDK files - MUST be first to prevent recursion
 cdk.out/
-.DS_Store
-README.md
-*.md
-.env*
-.vscode/
-.idea/
-*.log
-coverage/
-test/
-tests/
+infrastructure/
+
+# Git
+.git/
+
+# CDK asset ignore patterns
+node_modules/@aws-sdk/
+node_modules/@smithy/
+node_modules/aws-cdk-lib/
+node_modules/constructs/
+node_modules/@eslint/
+node_modules/eslint/
+node_modules/jest/
+node_modules/supertest/
+node_modules/nodemon/
+node_modules/dotenv-cli/
+
+# Test files
 __tests__/
-*.test.js
-*.spec.js
+coverage/
+jest.config.js
+eslint.config.js
+
+# Development files
+.env*
+*.md
+README.md
