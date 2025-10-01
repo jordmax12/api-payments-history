@@ -1,9 +1,14 @@
-import React from 'react';
 import { render, screen } from '@testing-library/react';
 import App from './App';
 
-test('renders learn react link', () => {
+test('renders app container', () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+  const appElement = document.querySelector('.App');
+  expect(appElement).toBeInTheDocument();
+});
+
+test('renders loading state initially', () => {
+  render(<App />);
+  const loadingElement = screen.getByText(/loading payments/i);
+  expect(loadingElement).toBeInTheDocument();
 });
