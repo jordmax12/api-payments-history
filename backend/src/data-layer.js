@@ -1,115 +1,133 @@
 const fs = require('fs');
 const path = require('path');
-const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const { DynamoDBDocumentClient, ScanCommand, GetCommand } = require('@aws-sdk/lib-dynamodb');
 
-const { AWS_LAMBDA_FUNCTION_NAME, PAYMENTS_TABLE_NAME, AWS_REGION } = process.env;
+// Lazy-load AWS SDK modules to prevent initialization issues in tests
+let DynamoDBClient, DynamoDBDocumentClient, ScanCommand, GetCommand;
 
-class DataLayer {
-  constructor() {
-    this.isLambda = !!AWS_LAMBDA_FUNCTION_NAME;
-    this.tableName = PAYMENTS_TABLE_NAME || 'PaymentsTable';
-    this._docClient = null; // Cache for DynamoDB client
+const loadAwsSdk = () => {
+  if (!DynamoDBClient) {
+    const clientModule = require('@aws-sdk/client-dynamodb');
+    const libModule = require('@aws-sdk/lib-dynamodb');
 
-    if (!this.isLambda) {
-      // Load JSON data for local development
-      this.loadLocalData();
-    }
+    DynamoDBClient = clientModule.DynamoDBClient;
+    DynamoDBDocumentClient = libModule.DynamoDBDocumentClient;
+    ScanCommand = libModule.ScanCommand;
+    GetCommand = libModule.GetCommand;
+  }
+};
+
+// Environment detection
+const isLambdaEnvironment = () => !!process.env.AWS_LAMBDA_FUNCTION_NAME;
+
+// Data loading functions
+const loadLocalData = () => {
+  try {
+    const dataPath = path.join(__dirname, '..', 'data', 'payments-test.json');
+    const rawData = fs.readFileSync(dataPath, 'utf8');
+    return JSON.parse(rawData);
+  } catch (error) {
+    console.warn('Could not load local payments data:', error.message);
+    return [];
+  }
+};
+
+// DynamoDB client creation
+const createDynamoClient = () => {
+  loadAwsSdk(); // Ensure AWS SDK is loaded
+  const region = process.env.AWS_REGION || 'us-east-1';
+  const dynamoClient = new DynamoDBClient({ region });
+  return DynamoDBDocumentClient.from(dynamoClient);
+};
+
+// Core data access functions
+const getAllPayments = async (options = {}) => {
+  const { isLambda = isLambdaEnvironment(), docClient, localData } = options;
+
+  if (isLambda) {
+    // DynamoDB scan
+    loadAwsSdk(); // Ensure AWS SDK is loaded
+    const client = docClient || createDynamoClient();
+    const tableName = process.env.PAYMENTS_TABLE_NAME || 'PaymentsTable';
+    const command = new ScanCommand({ TableName: tableName });
+    const result = await client.send(command);
+    return result.Items || [];
+  } else {
+    // Return local JSON data
+    return localData || loadLocalData();
+  }
+};
+
+const getPendingPayments = async (options = {}) => {
+  const allPayments = await getAllPayments(options);
+  return allPayments.filter(payment => payment.status === 'pending');
+};
+
+const getPaymentById = async (id, options = {}) => {
+  const { isLambda = isLambdaEnvironment(), docClient, localData } = options;
+
+  if (isLambda) {
+    // DynamoDB get item
+    loadAwsSdk(); // Ensure AWS SDK is loaded
+    const client = docClient || createDynamoClient();
+    const tableName = process.env.PAYMENTS_TABLE_NAME || 'PaymentsTable';
+    const command = new GetCommand({
+      TableName: tableName,
+      Key: { id }
+    });
+    const result = await client.send(command);
+    return result.Item || null;
+  } else {
+    // Find in local JSON data
+    const data = localData || loadLocalData();
+    return data.find(payment => payment.id === id) || null;
+  }
+};
+
+const getPaymentsWithFilters = async (filters = {}, options = {}) => {
+  const pendingPayments = await getPendingPayments(options);
+  let filteredPayments = [...pendingPayments];
+
+  // Filter by recipient
+  if (filters.recipient) {
+    const recipient = filters.recipient.toLowerCase();
+    filteredPayments = filteredPayments.filter(payment =>
+      payment.recipient.toLowerCase().includes(recipient)
+    );
   }
 
-  // Lazy initialization of DynamoDB client
-  getDynamoClient() {
-    if (!this._docClient && this.isLambda) {
-      const dynamoClient = new DynamoDBClient({ region: AWS_REGION || 'us-east-1' });
-      this._docClient = DynamoDBDocumentClient.from(dynamoClient);
-    }
-    return this._docClient;
+  // Filter by date (after)
+  if (filters.after) {
+    const afterDate = new Date(filters.after);
+    filteredPayments = filteredPayments.filter(payment =>
+      new Date(payment.scheduled_date) > afterDate
+    );
   }
 
-  loadLocalData() {
-    try {
-      const dataPath = path.join(__dirname, '..', 'data', 'payments-test.json');
-      const rawData = fs.readFileSync(dataPath, 'utf8');
-      this.localData = JSON.parse(rawData);
-    } catch (error) {
-      console.warn('Could not load local payments data:', error.message);
-      this.localData = [];
-    }
+  // Filter by date (before)
+  if (filters.before) {
+    const beforeDate = new Date(filters.before);
+    filteredPayments = filteredPayments.filter(payment =>
+      new Date(payment.scheduled_date) < beforeDate
+    );
   }
 
-  async getAllPayments() {
-    if (this.isLambda) {
-      // DynamoDB scan
-      const docClient = this.getDynamoClient();
-      const command = new ScanCommand({
-        TableName: this.tableName
-      });
-      const result = await docClient.send(command);
-      return result.Items || [];
-    } else {
-      // Return local JSON data
-      return this.localData;
-    }
+  // Filter by exact date
+  if (filters.date) {
+    filteredPayments = filteredPayments.filter(payment =>
+      payment.scheduled_date === filters.date
+    );
   }
 
-  async getPendingPayments() {
-    const allPayments = await this.getAllPayments();
-    return allPayments.filter(payment => payment.status === 'pending');
-  }
+  return filteredPayments;
+};
 
-  async getPaymentById(id) {
-    if (this.isLambda) {
-      // DynamoDB get item
-      const docClient = this.getDynamoClient();
-      const command = new GetCommand({
-        TableName: this.tableName,
-        Key: { id }
-      });
-      const result = await docClient.send(command);
-      return result.Item || null;
-    } else {
-      // Find in local JSON data
-      return this.localData.find(payment => payment.id === id) || null;
-    }
-  }
-
-  async getPaymentsWithFilters(filters = {}) {
-    const pendingPayments = await this.getPendingPayments();
-    let filteredPayments = [...pendingPayments];
-
-    // Filter by recipient
-    if (filters.recipient) {
-      const recipient = filters.recipient.toLowerCase();
-      filteredPayments = filteredPayments.filter(payment =>
-        payment.recipient.toLowerCase().includes(recipient)
-      );
-    }
-
-    // Filter by date (after)
-    if (filters.after) {
-      const afterDate = new Date(filters.after);
-      filteredPayments = filteredPayments.filter(payment =>
-        new Date(payment.scheduled_date) > afterDate
-      );
-    }
-
-    // Filter by date (before)
-    if (filters.before) {
-      const beforeDate = new Date(filters.before);
-      filteredPayments = filteredPayments.filter(payment =>
-        new Date(payment.scheduled_date) < beforeDate
-      );
-    }
-
-    // Filter by exact date
-    if (filters.date) {
-      filteredPayments = filteredPayments.filter(payment =>
-        payment.scheduled_date === filters.date
-      );
-    }
-
-    return filteredPayments;
-  }
-}
-
-module.exports = DataLayer;
+// Export functional API only
+module.exports = {
+  getAllPayments,
+  getPendingPayments,
+  getPaymentById,
+  getPaymentsWithFilters,
+  loadLocalData,
+  createDynamoClient,
+  isLambdaEnvironment
+};
